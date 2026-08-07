@@ -34,7 +34,7 @@ def users():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT telegram_id, name, age, gender, looking, city
+        SELECT telegram_id, name, age, gender, looking, city, photo_id
         FROM users
     """)
 
@@ -48,7 +48,8 @@ def users():
             "age": row["age"],
             "gender": row["gender"],
             "looking": row["looking"],
-            "city": row["city"]
+            "city": row["city"],
+            "photo_id": row["photo_id"]
         }
         for row in rows
     ])
