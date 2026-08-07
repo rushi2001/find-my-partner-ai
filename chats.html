@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Chats</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>💬 Chats</h2>
+
+    <div class="chat-list">
+
+        <div class="chat-item"
+             onclick="openChat('Priya')">
+
+            <div class="list-avatar">
+                👩
+            </div>
+
+            <div class="chat-info">
+
+                <h3>Priya</h3>
+
+                <p>Hi 👋</p>
+
+            </div>
+
+            <div class="online-dot">
+                🟢
+            </div>
+
+        </div>
+
+
+        <div class="chat-item"
+             onclick="openChat('Sneha')">
+
+            <div class="list-avatar">
+                👩
+            </div>
+
+            <div class="chat-info">
+
+                <h3>Sneha</h3>
+
+                <p>Hello 😊</p>
+
+            </div>
+
+            <div class="online-dot">
+                🟢
+            </div>
+
+        </div>
+
+
+        <div class="chat-item"
+             onclick="openChat('Pooja')">
+
+            <div class="list-avatar">
+                👩
+            </div>
+
+            <div class="chat-info">
+
+                <h3>Pooja</h3>
+
+                <p>See you soon!</p>
+
+            </div>
+
+            <div class="online-dot">
+                ⚪
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function openChat(name) {
+
+    window.location.href =
+        "chat.html?user=" +
+        encodeURIComponent(name);
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Chat</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <!-- Header -->
+
+    <div class="chat-header">
+
+        <button onclick="goBack()">⬅️</button>
+
+        <div class="chat-user">
+
+            <div class="chat-avatar">
+                👤
+            </div>
+
+            <div>
+
+                <h3>Priya</h3>
+
+                <p>Online</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Messages -->
+
+    <div class="messages" id="messages">
+
+        <div class="message received">
+            Hi 👋
+        </div>
+
+        <div class="message sent">
+            Hello 😊
+        </div>
+
+    </div>
+
+
+    <!-- Message Input -->
+
+    <div class="message-input">
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Type a message...">
+
+        <button onclick="sendMessage()">
+            ➤
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function sendMessage() {
+
+    const input =
+        document.getElementById("messageInput");
+
+    const text = input.value.trim();
+
+    if (text === "") {
+        return;
+    }
+
+    const message =
+        document.createElement("div");
+
+    message.className = "message sent";
+
+    message.innerText = text;
+
+    document
+        .getElementById("messages")
+        .appendChild(message);
+
+    input.value = "";
+
+    const messages =
+        document.getElementById("messages");
+
+    messages.scrollTop =
+        messages.scrollHeight;
+}
+
+
+function goBack() {
+
+    window.history.back();
+
+}
+
+</script>
+
+</body>
+
+</html>

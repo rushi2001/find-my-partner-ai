@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>✏️ Edit Profile</h2>
+
+    <div class="edit-form">
+<label>📸 Profile Photo</label>
+
+<input
+    type="file"
+    id="profilePhotoInput"
+    accept="image/*">
+        <label>👤 Name</label>
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Enter your name">
+
+
+        <label>🎂 Age</label>
+
+        <input
+            type="number"
+            id="age"
+            placeholder="Enter your age">
+
+
+        <label>🏙️ City</label>
+
+        <input
+            type="text"
+            id="city"
+            placeholder="Enter your city">
+
+
+        <label>❤️ Looking For</label>
+
+        <select id="looking">
+
+            <option value="Female">Female</option>
+
+            <option value="Male">Male</option>
+
+        </select>
+
+
+        <button
+            class="menu-btn"
+            onclick="saveProfile()">
+
+            💾 Save Profile
+
+        </button>
+
+
+        <button
+            class="menu-btn"
+            onclick="location.href='profile.html'">
+
+            ❌ Cancel
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function saveProfile() {
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const age =
+        document.getElementById("age").value.trim();
+
+    const city =
+        document.getElementById("city").value.trim();
+
+    const looking =
+        document.getElementById("looking").value;
+
+    const photoInput =
+        document.getElementById("profilePhotoInput");
+
+
+    // Check required fields
+
+    if (name === "" || age === "" || city === "") {
+
+        alert("Please fill all fields.");
+
+        return;
+    }
+
+
+    // Save basic information
+
+    localStorage.setItem(
+        "profileName",
+        name
+    );
+
+    localStorage.setItem(
+        "profileAge",
+        age
+    );
+
+    localStorage.setItem(
+        "profileCity",
+        city
+    );
+
+    localStorage.setItem(
+        "profileLooking",
+        looking
+    );
+
+
+    // Check photo
+
+    if (photoInput.files.length > 0) {
+
+        const file =
+            photoInput.files[0];
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload = function(event) {
+
+            localStorage.setItem(
+                "profilePhoto",
+                event.target.result
+            );
+
+            alert("✅ Profile Saved!");
+
+            location.href =
+                "profile.html";
+        };
+
+
+        reader.readAsDataURL(file);
+
+    } else {
+
+        alert("✅ Profile Saved!");
+
+        location.href =
+            "profile.html";
+    }
+
+}
+
+</script>
+
+</body>
+</html>

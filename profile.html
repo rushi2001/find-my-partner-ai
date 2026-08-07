@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>👤 My Profile</h2>
+
+    <div class="my-profile-card">
+
+        <div class="my-profile-photo">
+
+    <img
+        id="myProfilePhoto"
+        src=""
+        alt="Profile Photo"
+        style="
+            width:120px;
+            height:120px;
+            border-radius:50%;
+            object-fit:cover;
+        ">
+
+</div>
+
+        <h2 id="profileName">Rushi</h2>
+
+        <p id="profileBasic">
+            24 Years • Washim
+        </p>
+
+        <p id="profileLooking">
+            ❤️ Looking for: Female
+        </p>
+
+        <button
+            class="menu-btn"
+            onclick="location.href='edit-profile.html'">
+
+            ✏️ Edit Profile
+
+        </button>
+
+        <button
+            class="menu-btn"
+            onclick="location.href='home.html'">
+
+            🏠 Home
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const name =
+    localStorage.getItem("profileName");
+
+const age =
+    localStorage.getItem("profileAge");
+
+const city =
+    localStorage.getItem("profileCity");
+
+const looking =
+    localStorage.getItem("profileLooking");
+
+
+if (name) {
+
+    document.getElementById("profileName")
+        .innerText = name;
+
+}
+
+
+if (age && city) {
+
+    document.getElementById("profileBasic")
+        .innerText = age + " Years • " + city;
+
+}
+
+
+if (looking) {
+
+    document.getElementById("profileLooking")
+        .innerText =
+        "❤️ Looking for: " + looking;
+
+}
+const savedPhoto =
+    localStorage.getItem("profilePhoto");
+
+if (savedPhoto) {
+
+    document.getElementById("myProfilePhoto").src =
+        savedPhoto;
+
+}
+
+</script>
+
+</body>
+
+</html>

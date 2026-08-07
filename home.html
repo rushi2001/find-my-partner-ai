@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find My Partner AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top-bar">
+        <div class="profile">
+            <img src="https://i.pravatar.cc/100" class="avatar">
+            <div>
+                <h2>Welcome 👋</h2>
+                <p>Find My Partner AI</p>
+            </div>
+        </div>
+
+        <div class="notify">🔔</div>
+    </div>
+
+    <div class="card">
+        ❤️ <b>Online Users</b><br>
+        <span>1,245 Users Online</span>
+    </div>
+
+  <button class="menu-btn" onclick="location.href='find.html'">
+    🔥 Find Partner
+    <button class="menu-btn"
+        onclick="location.href='chats.html'">
+    💬 Chats
+</button>
+</button>
+<button class="menu-btn"
+        onclick="location.href='profile.html'">
+    👤 My Profile
+</button>
+    <button class="menu-btn">💕 Matches</button>
+    <button class="menu-btn">⭐ Premium</button>
+    <button class="menu-btn">⚙️ Settings</button>
+
+    <div class="bottom-nav">
+        <div>🏠</div>
+        <div>🔍</div>
+        <div>❤️</div>
+        <div>💬</div>
+        <div>👤</div>
+    </div>
+
+</div>
+<script>
+
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+
+tg.expand();
+
+console.log("Telegram User ID:");
+
+if (tg.initDataUnsafe &&
+    tg.initDataUnsafe.user) {
+
+    console.log(
+        tg.initDataUnsafe.user.id
+    );
+
+}
+
+</script>
+</body>
+</html>
