@@ -1,4 +1,4 @@
-const API_URL = "https://YOUR-RENDER-URL.onrender.com";
+const API_URL = "https://find-my-partner-ai.onrender.com";
 
 let profiles = [];
 let current = 0;
