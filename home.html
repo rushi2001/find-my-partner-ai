@@ -73,5 +73,29 @@ if (tg.initDataUnsafe &&
 }
 
 </script>
+<script>
+
+if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+
+    const user = tg.initDataUnsafe.user;
+
+    const box = document.createElement("div");
+
+    box.innerHTML = `
+        <p>Telegram Connected ✅</p>
+        <p>User: ${user.first_name || "User"}</p>
+        <p>ID: ${user.id}</p>
+    `;
+
+    box.style.padding = "15px";
+    box.style.margin = "15px";
+    box.style.borderRadius = "15px";
+    box.style.background = "rgba(255,255,255,0.1)";
+
+    document.body.appendChild(box);
+
+}
+
+</script>
 </body>
 </html>
