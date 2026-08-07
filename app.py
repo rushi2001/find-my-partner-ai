@@ -7,10 +7,37 @@ CORS(app)
 
 DB = "users.db"
 
-def get_db():
+def init_db():
+
     conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row
-    return conn
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users(
+        telegram_id INTEGER PRIMARY KEY,
+        name TEXT,
+        age TEXT,
+        gender TEXT,
+        looking TEXT,
+        city TEXT,
+        photo_id TEXT
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS likes(
+        from_user INTEGER,
+        to_user INTEGER,
+        UNIQUE(from_user, to_user)
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+init_db()
 
 
 @app.route("/")
