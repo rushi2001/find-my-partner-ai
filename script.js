@@ -1,34 +1,55 @@
 const API_URL = "https://find-my-partner-ai.onrender.com";
+
 const tg = window.Telegram.WebApp;
 
 tg.ready();
 tg.expand();
 
-const currentUserId =
-    tg.initDataUnsafe?.user?.id;
+const currentUserId = tg.initDataUnsafe?.user?.id;
+
 let profiles = [];
 let current = 0;
 
 
 // ===============================
-// LOAD PROFILES FROM BACKEND
+// LOAD PROFILES FOR CURRENT USER
 // ===============================
 
 async function loadProfiles() {
 
     try {
 
-        const response = await fetch(API_URL + "/users");
+        if (!currentUserId) {
 
-        if (!response.ok) {
-            throw new Error("Server error: " + response.status);
+            document.getElementById("profileName").innerText =
+                "Telegram Login Required";
+
+            document.getElementById("profileInfo").innerText =
+                "Open this app from Telegram.";
+
+            return;
         }
+
+        const response = await fetch(
+            API_URL + "/profiles/" + currentUserId
+        );
 
         const data = await response.json();
 
-        console.log("PROFILES:", data);
+        console.log("PROFILE API:", data);
 
-        profiles = data;
+        if (!data.success) {
+
+            document.getElementById("profileName").innerText =
+                "Registration Required";
+
+            document.getElementById("profileInfo").innerText =
+                data.message || "Please register first.";
+
+            return;
+        }
+
+        profiles = data.profiles || [];
 
         if (profiles.length === 0) {
 
@@ -36,7 +57,7 @@ async function loadProfiles() {
                 "No Profiles Found";
 
             document.getElementById("profileInfo").innerText =
-                "No users available";
+                "No matching profiles available.";
 
             return;
         }
@@ -47,19 +68,19 @@ async function loadProfiles() {
 
     } catch (error) {
 
-        console.error("API ERROR:", error);
+        console.error("PROFILE ERROR:", error);
 
         document.getElementById("profileName").innerText =
             "Connection Error";
 
         document.getElementById("profileInfo").innerText =
-            "Unable to connect to server";
+            "Unable to connect to server.";
     }
 }
 
 
 // ===============================
-// SHOW CURRENT PROFILE
+// SHOW PROFILE
 // ===============================
 
 function loadProfile() {
@@ -70,8 +91,11 @@ function loadProfile() {
 
     const profile = profiles[current];
 
-    document.getElementById("profilePhoto").src =
+    const photo =
+        profile.photo_id ||
         "https://i.pravatar.cc/500?u=" + profile.telegram_id;
+
+    document.getElementById("profilePhoto").src = photo;
 
     document.getElementById("profileName").innerText =
         profile.name;
@@ -83,7 +107,7 @@ function loadProfile() {
 
 
 // ===============================
-// NEXT PROFILE
+// NEXT
 // ===============================
 
 function nextProfile() {
@@ -100,13 +124,12 @@ function nextProfile() {
 
     loadProfile();
 
-    document.getElementById("profileCard").style.transform =
-        "translateX(0) rotate(0)";
+    resetCard();
 }
 
 
 // ===============================
-// PREVIOUS PROFILE
+// PREVIOUS
 // ===============================
 
 function previousProfile() {
@@ -123,8 +146,7 @@ function previousProfile() {
 
     loadProfile();
 
-    document.getElementById("profileCard").style.transform =
-        "translateX(0) rotate(0)";
+    resetCard();
 }
 
 
@@ -140,7 +162,7 @@ function skipProfile() {
 
 
 // ===============================
-// LIKE
+// REAL LIKE
 // ===============================
 
 async function likeProfile() {
@@ -175,7 +197,17 @@ async function likeProfile() {
 
         console.log("LIKE RESPONSE:", data);
 
-        if (data.success && data.match) {
+        if (!data.success) {
+
+            alert(
+                data.message ||
+                "Like could not be saved."
+            );
+
+            return;
+        }
+
+        if (data.match) {
 
             showMatch(likedProfile.name);
 
@@ -189,8 +221,9 @@ async function likeProfile() {
 
         console.error("LIKE ERROR:", error);
 
-        alert("Unable to save Like.");
-
+        alert(
+            "Unable to save Like. Please try again."
+        );
     }
 }
 
@@ -201,9 +234,11 @@ async function likeProfile() {
 
 function showMatch(name) {
 
-    const matchBox = document.createElement("div");
+    const matchBox =
+        document.createElement("div");
 
-    matchBox.className = "match-popup";
+    matchBox.className =
+        "match-popup";
 
     matchBox.innerHTML = `
         <div class="match-content">
@@ -215,7 +250,8 @@ function showMatch(name) {
             <h1>It's a Match!</h1>
 
             <p>
-                You and ${name} liked each other.
+                You and ${name}
+                liked each other.
             </p>
 
             <button onclick="openChat()">
@@ -240,7 +276,9 @@ function showMatch(name) {
 function closeMatch() {
 
     const popup =
-        document.querySelector(".match-popup");
+        document.querySelector(
+            ".match-popup"
+        );
 
     if (popup) {
         popup.remove();
@@ -256,8 +294,27 @@ function closeMatch() {
 
 function openChat() {
 
-    window.location.href = "chat.html";
+    window.location.href =
+        "chat.html";
+}
 
+
+// ===============================
+// RESET CARD
+// ===============================
+
+function resetCard() {
+
+    const card =
+        document.getElementById(
+            "profileCard"
+        );
+
+    if (card) {
+
+        card.style.transform =
+            "translateX(0) rotate(0)";
+    }
 }
 
 
@@ -266,7 +323,9 @@ function openChat() {
 // ===============================
 
 const card =
-    document.getElementById("profileCard");
+    document.getElementById(
+        "profileCard"
+    );
 
 let startX = 0;
 let currentX = 0;
@@ -275,82 +334,81 @@ let isDragging = false;
 
 if (card) {
 
-    card.addEventListener("touchstart", function(event) {
+    card.addEventListener(
+        "touchstart",
+        function(event) {
 
-        startX =
-            event.touches[0].clientX;
+            startX =
+                event.touches[0].clientX;
 
-        currentX = startX;
+            currentX = startX;
 
-        isDragging = true;
-
-    });
-
-
-    card.addEventListener("touchmove", function(event) {
-
-        if (!isDragging) {
-            return;
+            isDragging = true;
         }
-
-        currentX =
-            event.touches[0].clientX;
-
-        const moveX =
-            currentX - startX;
-
-        card.style.transform =
-            `translateX(${moveX}px)
-             rotate(${moveX / 20}deg)`;
-
-    });
+    );
 
 
-    card.addEventListener("touchend", function() {
+    card.addEventListener(
+        "touchmove",
+        function(event) {
 
-        if (!isDragging) {
-            return;
-        }
+            if (!isDragging) {
+                return;
+            }
 
-        isDragging = false;
+            currentX =
+                event.touches[0].clientX;
 
-        const moveX =
-            currentX - startX;
-
-
-        // RIGHT = LIKE
-        if (moveX > 120) {
-
-            likeProfile();
-
-        }
-
-        // LEFT = SKIP
-        else if (moveX < -120) {
-
-            skipProfile();
-
-        }
-
-        // RESET
-        else {
+            const moveX =
+                currentX - startX;
 
             card.style.transform =
-                "translateX(0) rotate(0)";
-
+                `translateX(${moveX}px)
+                 rotate(${moveX / 20}deg)`;
         }
+    );
 
-    });
 
+    card.addEventListener(
+        "touchend",
+        function() {
+
+            if (!isDragging) {
+                return;
+            }
+
+            isDragging = false;
+
+            const moveX =
+                currentX - startX;
+
+
+            if (moveX > 120) {
+
+                likeProfile();
+
+            } else if (moveX < -120) {
+
+                skipProfile();
+
+            } else {
+
+                resetCard();
+            }
+        }
+    );
 }
 
 
 // ===============================
-// START APP
+// START
 // ===============================
 
-window.addEventListener("load", function() {
+window.addEventListener(
+    "load",
+    function() {
 
-    loadProfiles();
+        loadProfiles();
 
-});
+    }
+);
