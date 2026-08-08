@@ -7,6 +7,10 @@ tg.expand();
 
 const currentUserId = tg.initDataUnsafe?.user?.id;
 
+console.log("Telegram WebApp:", tg);
+console.log("initData:", tg.initData);
+console.log("initDataUnsafe:", tg.initDataUnsafe);
+console.log("Telegram User:", tg.initDataUnsafe?.user);
 let profiles = [];
 let current = 0;
 
