@@ -84,7 +84,33 @@ def test():
 # =========================
 # USERS
 # =========================
+@app.route("/add-test-user")
+def add_test_user():
 
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT OR REPLACE INTO users
+        (telegram_id, name, age, gender, looking, city, photo_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        1111111111,
+        "Test User",
+        "24",
+        "Male",
+        "Female",
+        "Washim",
+        ""
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": "Test user added"
+    })
 @app.route("/users")
 def users():
 
