@@ -22,6 +22,8 @@ let current = 0;
 async function loadProfiles() {
 
     try {
+document.getElementById("profileName").innerText =
+    "Telegram ID: " + (currentUserId || "NOT FOUND");
 
         if (!currentUserId) {
 
