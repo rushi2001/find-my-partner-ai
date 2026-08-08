@@ -263,6 +263,33 @@ def like_user(from_user, to_user):
         "from_user": from_user,
         "to_user": to_user
     })
+@app.route("/add-test-user-2")
+def add_test_user_2():
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT OR REPLACE INTO users
+        (telegram_id, name, age, gender, looking, city, photo_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        2222222222,
+        "Test User 2",
+        "22",
+        "Female",
+        "Male",
+        "Washim",
+        ""
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": "Test User 2 added"
+    })
 if __name__ == "__main__":
 
     app.run(
