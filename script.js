@@ -143,26 +143,53 @@ function skipProfile() {
 // LIKE
 // ===============================
 
-function likeProfile() {
+async function likeProfile() {
 
     if (profiles.length === 0) {
         return;
     }
 
+    if (!currentUserId) {
+
+        alert("Telegram user not detected.");
+
+        return;
+    }
+
     const likedProfile = profiles[current];
 
-    console.log("Liked:", likedProfile);
+    try {
 
-    // Temporary match system
-    const isMatch = Math.random() < 0.5;
+        const response = await fetch(
+            API_URL +
+            "/like/" +
+            currentUserId +
+            "/" +
+            likedProfile.telegram_id,
+            {
+                method: "POST"
+            }
+        );
 
-    if (isMatch) {
+        const data = await response.json();
 
-        showMatch(likedProfile.name);
+        console.log("LIKE RESPONSE:", data);
 
-    } else {
+        if (data.success && data.match) {
 
-        nextProfile();
+            showMatch(likedProfile.name);
+
+        } else {
+
+            nextProfile();
+
+        }
+
+    } catch (error) {
+
+        console.error("LIKE ERROR:", error);
+
+        alert("Unable to save Like.");
 
     }
 }
