@@ -1,101 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Find My Partner AI</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="style.css">
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Find My Partner AI</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
+
+    <!-- TOP BAR -->
+
     <div class="top-bar">
+
         <div class="profile">
-            <img src="https://i.pravatar.cc/100" class="avatar">
+
+            <img
+                src="https://i.pravatar.cc/100"
+                class="avatar"
+            >
+
             <div>
-                <h2>Welcome 👋</h2>
-                <p>Find My Partner AI</p>
+
+                <h2>
+                    Welcome 👋
+                </h2>
+
+                <p>
+                    Find My Partner AI
+                </p>
+
             </div>
+
         </div>
 
-        <div class="notify">🔔</div>
+
+        <div class="notify">
+            🔔
+        </div>
+
     </div>
+
+
+
+    <!-- ONLINE USERS -->
 
     <div class="card">
-        ❤️ <b>Online Users</b><br>
-        <span>1,245 Users Online</span>
+
+        ❤️ <b>Online Users</b>
+
+        <br>
+
+        <span>
+            1,245 Users Online
+        </span>
+
     </div>
 
-  <button class="menu-btn" onclick="location.href='find.html'">
-    🔥 Find Partner
-    <button class="menu-btn"
-        onclick="location.href='chats.html'">
-    💬 Chats
-</button>
-</button>
-<button class="menu-btn"
-        onclick="location.href='profile.html'">
-    👤 My Profile
-</button>
-    <button class="menu-btn">💕 Matches</button>
-    <button class="menu-btn">⭐ Premium</button>
-    <button class="menu-btn">⚙️ Settings</button>
+
+
+    <!-- REGISTER -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='register.html'"
+    >
+        📝 Create Profile
+    </button>
+
+
+
+    <!-- FIND PARTNER -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='find.html'"
+    >
+        🔥 Find Partner
+    </button>
+
+
+
+    <!-- CHATS -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='chats.html'"
+    >
+        💬 Chats
+    </button>
+
+
+
+    <!-- MY PROFILE -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='profile.html'"
+    >
+        👤 My Profile
+    </button>
+
+
+
+    <!-- MATCHES -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='matches.html'"
+    >
+        💕 Matches
+    </button>
+
+
+
+    <!-- PREMIUM -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='premium.html'"
+    >
+        ⭐ Premium
+    </button>
+
+
+
+    <!-- SETTINGS -->
+
+    <button
+        class="menu-btn"
+        onclick="location.href='settings.html'"
+    >
+        ⚙️ Settings
+    </button>
+
+
+
+    <!-- BOTTOM NAV -->
 
     <div class="bottom-nav">
-        <div>🏠</div>
-        <div>🔍</div>
-        <div>❤️</div>
-        <div>💬</div>
-        <div>👤</div>
+
+        <div
+            onclick="location.href='home.html'"
+        >
+            🏠
+        </div>
+
+        <div
+            onclick="location.href='find.html'"
+        >
+            🔍
+        </div>
+
+        <div
+            onclick="location.href='matches.html'"
+        >
+            ❤️
+        </div>
+
+        <div
+            onclick="location.href='chats.html'"
+        >
+            💬
+        </div>
+
+        <div
+            onclick="location.href='profile.html'"
+        >
+            👤
+        </div>
+
     </div>
 
+
 </div>
+
+
+
+<!-- TELEGRAM -->
+
 <script>
 
-const tg = window.Telegram.WebApp;
+const tg =
+    window.Telegram.WebApp;
 
 tg.ready();
 
 tg.expand();
 
-console.log("Telegram User ID:");
 
-if (tg.initDataUnsafe &&
-    tg.initDataUnsafe.user) {
+console.log(
+    "Telegram WebApp initialized"
+);
+
+
+if (
+    tg.initDataUnsafe &&
+    tg.initDataUnsafe.user
+) {
+
+    const user =
+        tg.initDataUnsafe.user;
+
 
     console.log(
-        tg.initDataUnsafe.user.id
+        "Telegram User ID:",
+        user.id
     );
 
 }
 
 </script>
-<script>
 
-if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
 
-    const user = tg.initDataUnsafe.user;
-
-    const box = document.createElement("div");
-
-    box.innerHTML = `
-        <p>Telegram Connected ✅</p>
-        <p>User: ${user.first_name || "User"}</p>
-        <p>ID: ${user.id}</p>
-    `;
-
-    box.style.padding = "15px";
-    box.style.margin = "15px";
-    box.style.borderRadius = "15px";
-    box.style.background = "rgba(255,255,255,0.1)";
-
-    document.body.appendChild(box);
-
-}
-
-</script>
 </body>
+
 </html>
