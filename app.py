@@ -226,7 +226,43 @@ def profiles(telegram_id):
 # =========================
 # RUN
 # =========================
+# =========================
+# LIKE PROFILE
+# =========================
 
+@app.route("/like/<int:from_user>/<int:to_user>", methods=["POST"])
+def like_user(from_user, to_user):
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Save like
+    cursor.execute("""
+        INSERT OR IGNORE INTO likes
+        (from_user, to_user)
+        VALUES (?, ?)
+    """, (from_user, to_user))
+
+    conn.commit()
+
+    # Check whether other user already liked back
+    cursor.execute("""
+        SELECT 1
+        FROM likes
+        WHERE from_user=?
+        AND to_user=?
+    """, (to_user, from_user))
+
+    is_match = cursor.fetchone() is not None
+
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "match": is_match,
+        "from_user": from_user,
+        "to_user": to_user
+    })
 if __name__ == "__main__":
 
     app.run(
