@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Profile</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>❤️ Create Your Profile</h2>
+
+    <p>Tell us about yourself</p>
+
+
+    <!-- PROFILE PHOTO -->
+
+    <div class="photo-section">
+
+        <div class="photo-preview">
+
+            <img
+                id="photoPreview"
+                src="https://i.pravatar.cc/300"
+                alt="Profile Photo"
+            >
+
+        </div>
+
+        <input
+            type="file"
+            id="photo"
+            accept="image/*"
+        >
+
+    </div>
+
+
+    <!-- NAME -->
+
+    <input
+        type="text"
+        id="name"
+        placeholder="👤 Full Name"
+    >
+
+
+    <!-- AGE -->
+
+    <input
+        type="number"
+        id="age"
+        placeholder="🎂 Age"
+        min="18"
+    >
+
+
+    <!-- GENDER -->
+
+    <select id="gender">
+
+        <option value="">
+            👤 Select Gender
+        </option>
+
+        <option value="Male">
+            👨 Male
+        </option>
+
+        <option value="Female">
+            👩 Female
+        </option>
+
+    </select>
+
+
+    <!-- LOOKING FOR -->
+
+    <select id="looking">
+
+        <option value="">
+            ❤️ Looking For
+        </option>
+
+        <option value="Male">
+            👨 Male
+        </option>
+
+        <option value="Female">
+            👩 Female
+        </option>
+
+    </select>
+
+
+    <!-- CITY -->
+
+    <input
+        type="text"
+        id="city"
+        placeholder="🏙️ City"
+    >
+
+
+    <!-- REGISTER BUTTON -->
+
+    <button
+        onclick="registerUser()"
+    >
+        ✅ Create My Profile
+    </button>
+
+
+    <!-- MESSAGE -->
+
+    <p id="message"></p>
+
+</div>
+
+
+<script src="register.js"></script>
+
+</body>
+
+</html>
