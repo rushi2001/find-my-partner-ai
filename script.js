@@ -66,6 +66,28 @@ async function loadProfiles() {
 // SHOW CURRENT PROFILE
 // ===============================
 
+async function loadProfiles() {
+
+    try {
+
+        const response = await fetch(
+            API_URL + "/users"
+        );
+
+        const data = await response.json();
+
+        profiles = data;
+
+        current = 0;
+
+        loadProfile();
+
+    } catch (error) {
+
+        console.log("API Error:", error);
+
+    }
+}
 function loadProfile() {
 
     if (profiles.length === 0) return;
