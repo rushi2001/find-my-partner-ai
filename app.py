@@ -1,11 +1,16 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlite3
+import os
+import uuid
 
 app = Flask(__name__)
 CORS(app)
 
 DB = "users.db"
+
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # =========================
@@ -24,7 +29,6 @@ def get_db():
 def init_db():
 
     conn = get_db()
-
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -48,7 +52,6 @@ def init_db():
     """)
 
     conn.commit()
-
     conn.close()
 
 
@@ -82,40 +85,172 @@ def test():
 
 
 # =========================
+# REGISTER
+# =========================
+
+@app.route("/register", methods=["POST"])
+def register():
+
+    try:
+
+        telegram_id = request.form.get("telegram_id")
+        name = request.form.get("name")
+        age = request.form.get("age")
+        gender = request.form.get("gender")
+        looking = request.form.get("looking")
+        city = request.form.get("city")
+
+        photo = request.files.get("photo")
+
+
+        # -------------------------
+        # VALIDATION
+        # -------------------------
+
+        if not telegram_id:
+            return jsonify({
+                "success": False,
+                "message": "Telegram ID missing"
+            }), 400
+
+        if not name:
+            return jsonify({
+                "success": False,
+                "message": "Name is required"
+            }), 400
+
+        if not age:
+            return jsonify({
+                "success": False,
+                "message": "Age is required"
+            }), 400
+
+        if int(age) < 18:
+            return jsonify({
+                "success": False,
+                "message": "You must be 18+"
+            }), 400
+
+        if not gender:
+            return jsonify({
+                "success": False,
+                "message": "Gender is required"
+            }), 400
+
+        if not looking:
+            return jsonify({
+                "success": False,
+                "message": "Looking for is required"
+            }), 400
+
+        if not city:
+            return jsonify({
+                "success": False,
+                "message": "City is required"
+            }), 400
+
+
+        # -------------------------
+        # PHOTO
+        # -------------------------
+
+        photo_name = ""
+
+        if photo:
+
+            extension = os.path.splitext(
+                photo.filename
+            )[1]
+
+            photo_name = (
+                str(telegram_id)
+                + "_"
+                + uuid.uuid4().hex
+                + extension
+            )
+
+            photo_path = os.path.join(
+                UPLOAD_FOLDER,
+                photo_name
+            )
+
+            photo.save(photo_path)
+
+
+        # -------------------------
+        # DATABASE
+        # -------------------------
+
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        INSERT OR REPLACE INTO users
+        (
+            telegram_id,
+            name,
+            age,
+            gender,
+            looking,
+            city,
+            photo_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            int(telegram_id),
+            name,
+            age,
+            gender,
+            looking,
+            city,
+            photo_name
+        ))
+
+        conn.commit()
+        conn.close()
+
+
+        return jsonify({
+
+            "success": True,
+
+            "message":
+                "Profile created successfully",
+
+            "telegram_id":
+                int(telegram_id),
+
+            "name":
+                name
+
+        })
+
+
+    except Exception as e:
+
+        print("REGISTER ERROR:", e)
+
+        return jsonify({
+
+            "success": False,
+
+            "message":
+                "Registration failed",
+
+            "error":
+                str(e)
+
+        }), 500
+
+
+# =========================
 # USERS
 # =========================
-@app.route("/add-test-user")
-def add_test_user():
 
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        INSERT OR REPLACE INTO users
-        (telegram_id, name, age, gender, looking, city, photo_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        1111111111,
-        "Test User",
-        "24",
-        "Male",
-        "Female",
-        "Washim",
-        ""
-    ))
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({
-        "success": True,
-        "message": "Test user added"
-    })
 @app.route("/users")
 def users():
 
     conn = get_db()
-
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -140,17 +275,45 @@ def users():
 
         users_list.append({
 
-            "telegram_id": row["telegram_id"],
-            "name": row["name"],
-            "age": row["age"],
-            "gender": row["gender"],
-            "looking": row["looking"],
-            "city": row["city"],
-            "photo_id": row["photo_id"]
+            "telegram_id":
+                row["telegram_id"],
+
+            "name":
+                row["name"],
+
+            "age":
+                row["age"],
+
+            "gender":
+                row["gender"],
+
+            "looking":
+                row["looking"],
+
+            "city":
+                row["city"],
+
+            "photo_id":
+                row["photo_id"]
 
         })
 
     return jsonify(users_list)
+
+
+# =========================
+# PROFILE PHOTOS
+# =========================
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+
+    from flask import send_from_directory
+
+    return send_from_directory(
+        UPLOAD_FOLDER,
+        filename
+    )
 
 
 # =========================
@@ -161,7 +324,6 @@ def users():
 def profiles(telegram_id):
 
     conn = get_db()
-
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -177,11 +339,17 @@ def profiles(telegram_id):
         conn.close()
 
         return jsonify({
+
             "success": False,
-            "message": "User not registered"
+
+            "message":
+                "User not registered"
+
         }), 404
 
+
     looking = current_user["looking"]
+
 
     cursor.execute("""
         SELECT
@@ -194,7 +362,10 @@ def profiles(telegram_id):
         FROM users
         WHERE gender=?
         AND telegram_id!=?
-    """, (looking, telegram_id))
+    """, (
+        looking,
+        telegram_id
+    ))
 
     rows = cursor.fetchall()
 
@@ -204,65 +375,158 @@ def profiles(telegram_id):
 
     for row in rows:
 
+        photo_url = ""
+
+        if row["photo_id"]:
+
+            photo_url = (
+                request.host_url.rstrip("/")
+                + "/uploads/"
+                + row["photo_id"]
+            )
+
+
         profiles_list.append({
 
-            "telegram_id": row["telegram_id"],
-            "name": row["name"],
-            "age": row["age"],
-            "gender": row["gender"],
-            "city": row["city"],
-            "photo_id": row["photo_id"]
+            "telegram_id":
+                row["telegram_id"],
+
+            "name":
+                row["name"],
+
+            "age":
+                row["age"],
+
+            "gender":
+                row["gender"],
+
+            "city":
+                row["city"],
+
+            "photo":
+                photo_url
 
         })
+
 
     return jsonify({
 
         "success": True,
-        "profiles": profiles_list
+
+        "profiles":
+            profiles_list
 
     })
 
 
 # =========================
-# RUN
-# =========================
-# =========================
 # LIKE PROFILE
 # =========================
 
-@app.route("/like/<int:from_user>/<int:to_user>", methods=["POST"])
+@app.route(
+    "/like/<int:from_user>/<int:to_user>",
+    methods=["POST"]
+)
 def like_user(from_user, to_user):
 
     conn = get_db()
     cursor = conn.cursor()
 
-    # Save like
     cursor.execute("""
         INSERT OR IGNORE INTO likes
         (from_user, to_user)
         VALUES (?, ?)
-    """, (from_user, to_user))
+    """, (
+        from_user,
+        to_user
+    ))
 
     conn.commit()
 
-    # Check whether other user already liked back
+
     cursor.execute("""
         SELECT 1
         FROM likes
         WHERE from_user=?
         AND to_user=?
-    """, (to_user, from_user))
+    """, (
+        to_user,
+        from_user
+    ))
 
-    is_match = cursor.fetchone() is not None
+    is_match = (
+        cursor.fetchone()
+        is not None
+    )
 
     conn.close()
 
+
     return jsonify({
+
         "success": True,
-        "match": is_match,
-        "from_user": from_user,
-        "to_user": to_user
+
+        "match":
+            is_match,
+
+        "from_user":
+            from_user,
+
+        "to_user":
+            to_user
+
     })
+
+
+# =========================
+# TEST USER 1
+# =========================
+
+@app.route("/add-test-user")
+def add_test_user():
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT OR REPLACE INTO users
+        (
+            telegram_id,
+            name,
+            age,
+            gender,
+            looking,
+            city,
+            photo_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        1111111111,
+        "Test User",
+        "24",
+        "Male",
+        "Female",
+        "Washim",
+        ""
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+
+        "success": True,
+
+        "message":
+            "Test user added"
+
+    })
+
+
+# =========================
+# TEST USER 2
+# =========================
+
 @app.route("/add-test-user-2")
 def add_test_user_2():
 
@@ -271,7 +535,15 @@ def add_test_user_2():
 
     cursor.execute("""
         INSERT OR REPLACE INTO users
-        (telegram_id, name, age, gender, looking, city, photo_id)
+        (
+            telegram_id,
+            name,
+            age,
+            gender,
+            looking,
+            city,
+            photo_id
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
         2222222222,
@@ -287,9 +559,19 @@ def add_test_user_2():
     conn.close()
 
     return jsonify({
+
         "success": True,
-        "message": "Test User 2 added"
+
+        "message":
+            "Test User 2 added"
+
     })
+
+
+# =========================
+# RUN
+# =========================
+
 if __name__ == "__main__":
 
     app.run(
