@@ -2,58 +2,112 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Find Partner</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
 <body>
 
 <div class="container">
 
+    <!-- PAGE TITLE -->
+
     <h2>🔥 Find Partner</h2>
 
-    <div class="profile-card" id="profileCard">
+
+    <!-- PROFILE CARD -->
+
+    <div
+        class="profile-card"
+        id="profileCard"
+    >
 
         <img
             id="profilePhoto"
             class="profile-image"
+            alt="Profile Photo"
         >
 
         <div class="profile-details">
 
-            <h2 id="profileName"></h2>
+            <h2 id="profileName">
+                Loading...
+            </h2>
 
-            <p id="profileInfo"></p>
+            <p id="profileInfo">
+                Please wait...
+            </p>
 
         </div>
 
     </div>
 
+
+    <!-- ACTION BUTTONS -->
+
     <div class="action-buttons">
+
+        <!-- PREVIOUS -->
+
+        <button
+            class="prev-btn"
+            onclick="previousProfile()"
+        >
+            ⬅️
+        </button>
+
+
+        <!-- SKIP -->
 
         <button
             class="skip-btn"
-            onclick="skipProfile()">
+            onclick="skipProfile()"
+        >
             ❌
         </button>
 
+
+        <!-- LIKE -->
+
         <button
             class="like-btn"
-            onclick="likeProfile()">
+            onclick="likeProfile()"
+        >
             ❤️
+        </button>
+
+
+        <!-- NEXT -->
+
+        <button
+            class="next-btn"
+            onclick="nextProfile()"
+        >
+            ➡️
         </button>
 
     </div>
 
 </div>
 
+
+<!-- JAVASCRIPT -->
+
 <script src="script.js"></script>
 
 </body>
+
 </html>
