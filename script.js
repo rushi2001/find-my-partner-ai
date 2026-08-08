@@ -1,5 +1,11 @@
 const API_URL = "https://find-my-partner-ai.onrender.com";
+const tg = window.Telegram.WebApp;
 
+tg.ready();
+tg.expand();
+
+const currentUserId =
+    tg.initDataUnsafe?.user?.id;
 let profiles = [];
 let current = 0;
 
