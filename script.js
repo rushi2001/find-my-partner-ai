@@ -12,26 +12,15 @@ async function loadProfiles() {
 
     try {
 
-        const response = await fetch(API_URL + "/users");
-
-        if (!response.ok) {
-            throw new Error("API Error");
-        }
+        const response = await fetch(
+            "https://find-my-partner-ai.onrender.com/users"
+        );
 
         const data = await response.json();
 
-        profiles = data.map(user => ({
-            telegram_id: user.telegram_id,
-            name: user.name,
-            age: user.age,
-            gender: user.gender,
-            looking: user.looking,
-            city: user.city,
+        console.log("PROFILES:", data);
 
-            // Temporary photo
-            photo: "https://i.pravatar.cc/500?u=" + user.telegram_id
-        }));
-
+        profiles = data;
 
         if (profiles.length === 0) {
 
@@ -39,11 +28,10 @@ async function loadProfiles() {
                 "No Profiles Found";
 
             document.getElementById("profileInfo").innerText =
-                "Try again later";
+                "No users available";
 
             return;
         }
-
 
         current = 0;
 
@@ -51,13 +39,13 @@ async function loadProfiles() {
 
     } catch (error) {
 
-        console.error("Backend Error:", error);
+        console.error("API ERROR:", error);
 
         document.getElementById("profileName").innerText =
             "Connection Error";
 
         document.getElementById("profileInfo").innerText =
-            "Unable to load profiles";
+            "Unable to connect to server";
     }
 }
 
@@ -95,7 +83,7 @@ function loadProfile() {
     const profile = profiles[current];
 
     document.getElementById("profilePhoto").src =
-        profile.photo;
+    profile.photo || "https://i.pravatar.cc/500?u=" + profile.telegram_id;
 
     document.getElementById("profileName").innerText =
         profile.name;
