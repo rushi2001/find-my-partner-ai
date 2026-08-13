@@ -3,24 +3,20 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-
-// ==========================================
-// TELEGRAM USER
-// ==========================================
+const message = document.getElementById("message");
+const button = document.getElementById("createProfileBtn");
 
 const user = tg.initDataUnsafe?.user;
 
 
-// ==========================================
+// ===============================
 // TELEGRAM TEST
-// ==========================================
-
-const message = document.getElementById("message");
+// ===============================
 
 if (user) {
 
     message.innerHTML = `
-        Telegram Connected ✅<br><br>
+        <b>Telegram Connected ✅</b><br><br>
         User ID: ${user.id}<br>
         User Name: ${user.first_name || "No name"}
     `;
@@ -28,16 +24,16 @@ if (user) {
 } else {
 
     message.innerHTML = `
-        ⚠️ Telegram User Not Found<br><br>
-        Please open this Mini App from Telegram.
+        <b>Telegram User Not Found ❌</b><br><br>
+        initData length: ${tg.initData ? tg.initData.length : 0}
     `;
 
 }
 
 
-// ==========================================
+// ===============================
 // PHOTO PREVIEW
-// ==========================================
+// ===============================
 
 const photoInput = document.getElementById("photo");
 const photoPreview = document.getElementById("photoPreview");
@@ -46,14 +42,12 @@ photoInput.addEventListener("change", function () {
 
     const file = this.files[0];
 
-    if (!file) {
-        return;
-    }
+    if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = function (event) {
-        photoPreview.src = event.target.result;
+    reader.onload = function (e) {
+        photoPreview.src = e.target.result;
     };
 
     reader.readAsDataURL(file);
@@ -61,11 +55,17 @@ photoInput.addEventListener("change", function () {
 });
 
 
-// ==========================================
-// CREATE PROFILE
-// ==========================================
+// ===============================
+// BUTTON CLICK
+// ===============================
 
-function registerUser() {
+button.addEventListener("click", function () {
+
+    // FIRST: prove that button works
+    message.innerHTML = "⏳ Button clicked...";
+
+    console.log("CREATE PROFILE BUTTON CLICKED");
+
 
     const name =
         document.getElementById("name").value.trim();
@@ -83,9 +83,9 @@ function registerUser() {
         document.getElementById("city").value.trim();
 
 
-    // --------------------------------------
+    // ===============================
     // VALIDATION
-    // --------------------------------------
+    // ===============================
 
     if (!user) {
 
@@ -95,7 +95,6 @@ function registerUser() {
         return;
     }
 
-
     if (!name) {
 
         message.innerHTML =
@@ -103,7 +102,6 @@ function registerUser() {
 
         return;
     }
-
 
     if (!age || Number(age) < 18) {
 
@@ -113,37 +111,34 @@ function registerUser() {
         return;
     }
 
-
     if (!gender) {
 
         message.innerHTML =
-            "❌ Please select your gender.";
+            "❌ Please select Gender.";
 
         return;
     }
-
 
     if (!looking) {
 
         message.innerHTML =
-            "❌ Please select what you are looking for.";
+            "❌ Please select Looking For.";
 
         return;
     }
-
 
     if (!city) {
 
         message.innerHTML =
-            "❌ Please enter your city.";
+            "❌ Please enter City.";
 
         return;
     }
 
 
-    // --------------------------------------
+    // ===============================
     // PROFILE DATA
-    // --------------------------------------
+    // ===============================
 
     const profile = {
 
@@ -164,32 +159,43 @@ function registerUser() {
     };
 
 
-    console.log(
-        "PROFILE DATA:",
-        profile
-    );
+    console.log("PROFILE:", profile);
 
 
-    // --------------------------------------
-    // SEND DATA TO TELEGRAM BOT
-    // --------------------------------------
+    message.innerHTML =
+        "⏳ Profile ready...";
 
-    try {
 
-        tg.sendData(
-            JSON.stringify(profile)
-        );
+    // ===============================
+    // SEND TO TELEGRAM
+    // ===============================
+
+    if (typeof tg.sendData === "function") {
+
+        try {
+
+            tg.sendData(
+                JSON.stringify(profile)
+            );
+
+            message.innerHTML =
+                "✅ Profile sent to Telegram!";
+
+        } catch (error) {
+
+            console.error(
+                "sendData error:",
+                error
+            );
+
+            message.innerHTML =
+                "❌ Telegram sendData error.";
+        }
+
+    } else {
 
         message.innerHTML =
-            "✅ Profile submitted successfully!";
-
-    } catch (error) {
-
-        console.error(error);
-
-        message.innerHTML =
-            "❌ Something went wrong.";
-
+            "❌ Telegram sendData unavailable.";
     }
 
-}
+});
