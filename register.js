@@ -5,17 +5,35 @@ tg.expand();
 
 const user = tg.initDataUnsafe?.user;
 
-document.getElementById("message").innerHTML = `
-    <b>Telegram Test</b><br><br>
+const message = document.getElementById("message");
 
-    initData length:
-    ${tg.initData ? tg.initData.length : 0}
-    <br><br>
+if (user) {
 
-    User ID:
-    ${user ? user.id : "NOT FOUND"}
-    <br><br>
+    message.innerHTML = `
+        <b>Telegram Connected ✅</b><br><br>
 
-    User Name:
-    ${user ? (user.first_name || "No name") : "NOT FOUND"}
-`;
+        initData length:
+        ${tg.initData ? tg.initData.length : 0}
+        <br><br>
+
+        User ID:
+        ${user.id}
+        <br><br>
+
+        User Name:
+        ${user.first_name || "No name"}
+    `;
+
+} else {
+
+    message.innerHTML = `
+        <b>Telegram User NOT FOUND ❌</b><br><br>
+
+        initData length:
+        ${tg.initData ? tg.initData.length : 0}
+        <br><br>
+
+        Please open this Mini App directly
+        from the Telegram bot.
+    `;
+}
