@@ -1,4 +1,7 @@
 import os
+import threading
+
+from flask import Flask
 
 from telegram import (
     Update,
@@ -22,12 +25,41 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 WEB_APP_URL = "https://rushi2001.github.io/find-my-partner-ai/"
 
+PORT = int(os.environ.get("PORT", 10000))
+
 
 # ==================================================
-# START COMMAND
+# FLASK SERVER
 # ==================================================
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+server = Flask(__name__)
+
+
+@server.route("/")
+def home():
+    return "Find My Partner AI Bot is running!"
+
+
+@server.route("/health")
+def health():
+    return "OK"
+
+
+def run_server():
+    server.run(
+        host="0.0.0.0",
+        port=PORT
+    )
+
+
+# ==================================================
+# TELEGRAM BOT
+# ==================================================
+
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     keyboard = [
         [
@@ -40,7 +72,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     ]
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(
+        keyboard
+    )
 
     await update.message.reply_text(
         "❤️ Welcome to Find My Partner AI!\n\n"
@@ -73,38 +107,41 @@ async def help_command(
     await update.message.reply_text(
         "❤️ Find My Partner AI\n\n"
         "Use the button below to open the Mini App.",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=InlineKeyboardMarkup(
+            keyboard
+        )
     )
 
 
 # ==================================================
-# MAIN
+# BOT FUNCTION
 # ==================================================
 
-def main():
+def run_bot():
 
     if not BOT_TOKEN:
-        raise ValueError(
-            "BOT_TOKEN environment variable is missing!"
+
+        print(
+            "❌ BOT_TOKEN environment variable is missing!"
         )
 
-    app = (
+        return
+
+    application = (
         Application
         .builder()
         .token(BOT_TOKEN)
         .build()
     )
 
-    # /start
-    app.add_handler(
+    application.add_handler(
         CommandHandler(
             "start",
             start
         )
     )
 
-    # /help
-    app.add_handler(
+    application.add_handler(
         CommandHandler(
             "help",
             help_command
@@ -112,17 +149,31 @@ def main():
     )
 
     print(
-        "🤖 Find My Partner AI Bot is running..."
+        "🤖 Telegram Bot Starting..."
     )
 
-    app.run_polling(
+    application.run_polling(
         drop_pending_updates=True
     )
 
 
 # ==================================================
-# RUN
+# MAIN
 # ==================================================
 
 if __name__ == "__main__":
-    main()
+
+    print(
+        "🚀 Find My Partner AI Starting..."
+    )
+
+    # Start Flask server
+    server_thread = threading.Thread(
+        target=run_server,
+        daemon=True
+    )
+
+    server_thread.start()
+
+    # Start Telegram bot
+    run_bot()
