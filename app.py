@@ -93,6 +93,10 @@ def register():
 
     try:
 
+        # =========================
+        # FORM DATA
+        # =========================
+
         telegram_id = request.form.get("telegram_id")
         name = request.form.get("name")
         age = request.form.get("age")
@@ -103,9 +107,9 @@ def register():
         photo = request.files.get("photo")
 
 
-        # -------------------------
+        # =========================
         # VALIDATION
-        # -------------------------
+        # =========================
 
         if not telegram_id:
             return jsonify({
@@ -125,7 +129,15 @@ def register():
                 "message": "Age is required"
             }), 400
 
-        if int(age) < 18:
+        try:
+            age_number = int(age)
+        except ValueError:
+            return jsonify({
+                "success": False,
+                "message": "Invalid age"
+            }), 400
+
+        if age_number < 18:
             return jsonify({
                 "success": False,
                 "message": "You must be 18+"
@@ -150,17 +162,32 @@ def register():
             }), 400
 
 
-        # -------------------------
+        # =========================
         # PHOTO
-        # -------------------------
+        # =========================
 
         photo_name = ""
 
-        if photo:
+        if photo and photo.filename:
 
             extension = os.path.splitext(
                 photo.filename
-            )[1]
+            )[1].lower()
+
+            allowed_extensions = [
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp"
+            ]
+
+            if extension not in allowed_extensions:
+
+                return jsonify({
+                    "success": False,
+                    "message": "Invalid photo format"
+                }), 400
+
 
             photo_name = (
                 str(telegram_id)
@@ -177,29 +204,29 @@ def register():
             photo.save(photo_path)
 
 
-        # -------------------------
+        # =========================
         # DATABASE
-        # -------------------------
+        # =========================
 
         conn = get_db()
         cursor = conn.cursor()
 
         cursor.execute("""
-        INSERT OR REPLACE INTO users
-        (
-            telegram_id,
-            name,
-            age,
-            gender,
-            looking,
-            city,
-            photo_id
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO users
+            (
+                telegram_id,
+                name,
+                age,
+                gender,
+                looking,
+                city,
+                photo_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
             int(telegram_id),
             name,
-            age,
+            str(age_number),
             gender,
             looking,
             city,
@@ -209,6 +236,10 @@ def register():
         conn.commit()
         conn.close()
 
+
+        # =========================
+        # SUCCESS
+        # =========================
 
         return jsonify({
 
@@ -221,9 +252,32 @@ def register():
                 int(telegram_id),
 
             "name":
-                name
+                name,
+
+            "photo":
+                photo_name
 
         })
+
+
+    except Exception as e:
+
+        print(
+            "REGISTER ERROR:",
+            str(e)
+        )
+
+        return jsonify({
+
+            "success": False,
+
+            "message":
+                "Registration failed",
+
+            "error":
+                str(e)
+
+        }), 500
 
 
     except Exception as e:
