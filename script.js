@@ -1,209 +1,309 @@
-const API_URL = "https://find-my-partner-ai.onrender.com";
+const API_URL =
+    "https://find-my-partner-ai.onrender.com";
 
 const tg = window.Telegram.WebApp;
 
 tg.ready();
 tg.expand();
 
-const currentUserId = tg.initDataUnsafe?.user?.id;
+const currentUserId =
+    tg.initDataUnsafe?.user?.id;
 
-console.log("Telegram WebApp:", tg);
-console.log("initData:", tg.initData);
-console.log("initDataUnsafe:", tg.initDataUnsafe);
-console.log("Telegram User:", tg.initDataUnsafe?.user);
+console.log("Telegram User:", currentUserId);
+
 let profiles = [];
 let current = 0;
 
 
-// ===============================
-// LOAD PROFILES FOR CURRENT USER
-// ===============================
+// ==========================================
+// LOAD PROFILES
+// ==========================================
 
 async function loadProfiles() {
 
     try {
-document.getElementById("profileName").innerText =
-    "Telegram ID: " + (currentUserId || "NOT FOUND");
+
+        const nameElement =
+            document.getElementById("profileName");
+
+        const infoElement =
+            document.getElementById("profileInfo");
 
         if (!currentUserId) {
 
-            document.getElementById("profileName").innerText =
+            nameElement.innerText =
                 "Telegram Login Required";
 
-            document.getElementById("profileInfo").innerText =
-                "Open this app from Telegram.";
+            infoElement.innerText =
+                "Please open this app from Telegram.";
 
             return;
         }
+
+
+        nameElement.innerText =
+            "Loading...";
+
+        infoElement.innerText =
+            "Finding profiles...";
+
 
         const response = await fetch(
-            API_URL + "/profiles/" + currentUserId
+            API_URL +
+            "/profiles/" +
+            currentUserId
         );
 
-        const data = await response.json();
 
-        console.log("PROFILE API:", data);
+        const data =
+            await response.json();
 
-        if (!data.success) {
 
-            document.getElementById("profileName").innerText =
+        console.log(
+            "PROFILE API:",
+            data
+        );
+
+
+        if (!response.ok || !data.success) {
+
+            nameElement.innerText =
                 "Registration Required";
 
-            document.getElementById("profileInfo").innerText =
-                data.message || "Please register first.";
+            infoElement.innerText =
+                data.message ||
+                "Please create your profile first.";
 
             return;
         }
 
-        profiles = data.profiles || [];
+
+        profiles =
+            data.profiles || [];
+
 
         if (profiles.length === 0) {
 
-            document.getElementById("profileName").innerText =
+            nameElement.innerText =
                 "No Profiles Found";
 
-            document.getElementById("profileInfo").innerText =
+            infoElement.innerText =
                 "No matching profiles available.";
+
+            document.getElementById(
+                "profilePhoto"
+            ).style.display = "none";
 
             return;
         }
 
+
         current = 0;
+
+        document.getElementById(
+            "profilePhoto"
+        ).style.display = "block";
+
 
         loadProfile();
 
+
     } catch (error) {
 
-        console.error("PROFILE ERROR:", error);
+        console.error(
+            "PROFILE ERROR:",
+            error
+        );
 
-        document.getElementById("profileName").innerText =
+
+        document.getElementById(
+            "profileName"
+        ).innerText =
             "Connection Error";
 
-        document.getElementById("profileInfo").innerText =
+
+        document.getElementById(
+            "profileInfo"
+        ).innerText =
             "Unable to connect to server.";
     }
 }
 
 
-// ===============================
+// ==========================================
 // SHOW PROFILE
-// ===============================
+// ==========================================
 
 function loadProfile() {
 
-    if (profiles.length === 0) {
+    if (!profiles.length) {
         return;
     }
 
-    const profile = profiles[current];
 
-    const photo =
-        profile.photo_id ||
-        "https://i.pravatar.cc/500?u=" + profile.telegram_id;
+    const profile =
+        profiles[current];
 
-    document.getElementById("profilePhoto").src = photo;
 
-    document.getElementById("profileName").innerText =
+    const photoElement =
+        document.getElementById(
+            "profilePhoto"
+        );
+
+
+    // IMPORTANT:
+    // Backend returns "photo",
+    // not "photo_id"
+
+    if (profile.photo) {
+
+        photoElement.src =
+            profile.photo;
+
+    } else {
+
+        photoElement.src =
+            "https://i.pravatar.cc/500?u=" +
+            profile.telegram_id;
+    }
+
+
+    document.getElementById(
+        "profileName"
+    ).innerText =
         profile.name;
 
-    document.getElementById("profileInfo").innerText =
-        profile.age + " Years • " +
+
+    document.getElementById(
+        "profileInfo"
+    ).innerText =
+        profile.age +
+        " Years • " +
         profile.city;
+
+
+    resetCard();
 }
 
 
-// ===============================
+// ==========================================
 // NEXT
-// ===============================
+// ==========================================
 
 function nextProfile() {
 
-    if (profiles.length === 0) {
+    if (!profiles.length) {
         return;
     }
+
 
     current++;
 
+
     if (current >= profiles.length) {
+
         current = 0;
     }
 
-    loadProfile();
 
-    resetCard();
+    loadProfile();
 }
 
 
-// ===============================
+// ==========================================
 // PREVIOUS
-// ===============================
+// ==========================================
 
 function previousProfile() {
 
-    if (profiles.length === 0) {
+    if (!profiles.length) {
         return;
     }
+
 
     current--;
 
+
     if (current < 0) {
-        current = profiles.length - 1;
+
+        current =
+            profiles.length - 1;
     }
 
-    loadProfile();
 
-    resetCard();
+    loadProfile();
 }
 
 
-// ===============================
+// ==========================================
 // SKIP
-// ===============================
+// ==========================================
 
 function skipProfile() {
 
-    nextProfile();
+    if (!profiles.length) {
+        return;
+    }
 
+
+    nextProfile();
 }
 
 
-// ===============================
-// REAL LIKE
-// ===============================
+// ==========================================
+// LIKE
+// ==========================================
 
 async function likeProfile() {
 
-    if (profiles.length === 0) {
+    if (!profiles.length) {
         return;
     }
+
 
     if (!currentUserId) {
 
-        alert("Telegram user not detected.");
+        alert(
+            "Telegram user not detected."
+        );
 
         return;
     }
 
-    const likedProfile = profiles[current];
+
+    const likedProfile =
+        profiles[current];
+
 
     try {
 
-        const response = await fetch(
-            API_URL +
-            "/like/" +
-            currentUserId +
-            "/" +
-            likedProfile.telegram_id,
-            {
-                method: "POST"
-            }
+        const response =
+            await fetch(
+
+                API_URL +
+                "/like/" +
+                currentUserId +
+                "/" +
+                likedProfile.telegram_id,
+
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "LIKE RESPONSE:",
+            data
         );
 
-        const data = await response.json();
 
-        console.log("LIKE RESPONSE:", data);
-
-        if (!data.success) {
+        if (!response.ok ||
+            !data.success) {
 
             alert(
                 data.message ||
@@ -213,71 +313,105 @@ async function likeProfile() {
             return;
         }
 
+
         if (data.match) {
 
-            showMatch(likedProfile.name);
+            showMatch(
+                likedProfile.name
+            );
 
         } else {
 
             nextProfile();
-
         }
+
 
     } catch (error) {
 
-        console.error("LIKE ERROR:", error);
+        console.error(
+            "LIKE ERROR:",
+            error
+        );
+
 
         alert(
-            "Unable to save Like. Please try again."
+            "Unable to save Like."
         );
     }
 }
 
 
-// ===============================
+// ==========================================
 // MATCH POPUP
-// ===============================
+// ==========================================
 
 function showMatch(name) {
 
+    const oldPopup =
+        document.querySelector(
+            ".match-popup"
+        );
+
+
+    if (oldPopup) {
+        oldPopup.remove();
+    }
+
+
     const matchBox =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     matchBox.className =
         "match-popup";
 
+
     matchBox.innerHTML = `
+
         <div class="match-content">
 
             <div class="match-heart">
                 💕
             </div>
 
-            <h1>It's a Match!</h1>
+            <h1>
+                It's a Match!
+            </h1>
 
             <p>
-                You and ${name}
+                You and
+                <b>${name}</b>
                 liked each other.
             </p>
 
-            <button onclick="openChat()">
+            <button
+                onclick="openChat()"
+            >
                 💬 Start Chat
             </button>
 
-            <button onclick="closeMatch()">
+            <button
+                onclick="closeMatch()"
+            >
                 Continue Finding
             </button>
 
         </div>
+
     `;
 
-    document.body.appendChild(matchBox);
+
+    document.body.appendChild(
+        matchBox
+    );
 }
 
 
-// ===============================
+// ==========================================
 // CLOSE MATCH
-// ===============================
+// ==========================================
 
 function closeMatch() {
 
@@ -286,17 +420,20 @@ function closeMatch() {
             ".match-popup"
         );
 
+
     if (popup) {
+
         popup.remove();
     }
+
 
     nextProfile();
 }
 
 
-// ===============================
+// ==========================================
 // OPEN CHAT
-// ===============================
+// ==========================================
 
 function openChat() {
 
@@ -305,9 +442,9 @@ function openChat() {
 }
 
 
-// ===============================
+// ==========================================
 // RESET CARD
-// ===============================
+// ==========================================
 
 function resetCard() {
 
@@ -315,6 +452,7 @@ function resetCard() {
         document.getElementById(
             "profileCard"
         );
+
 
     if (card) {
 
@@ -324,14 +462,15 @@ function resetCard() {
 }
 
 
-// ===============================
+// ==========================================
 // SWIPE
-// ===============================
+// ==========================================
 
 const card =
     document.getElementById(
         "profileCard"
     );
+
 
 let startX = 0;
 let currentX = 0;
@@ -347,9 +486,11 @@ if (card) {
             startX =
                 event.touches[0].clientX;
 
-            currentX = startX;
+            currentX =
+                startX;
 
-            isDragging = true;
+            isDragging =
+                true;
         }
     );
 
@@ -362,11 +503,14 @@ if (card) {
                 return;
             }
 
+
             currentX =
                 event.touches[0].clientX;
 
+
             const moveX =
                 currentX - startX;
+
 
             card.style.transform =
                 `translateX(${moveX}px)
@@ -383,7 +527,10 @@ if (card) {
                 return;
             }
 
-            isDragging = false;
+
+            isDragging =
+                false;
+
 
             const moveX =
                 currentX - startX;
@@ -406,9 +553,9 @@ if (card) {
 }
 
 
-// ===============================
+// ==========================================
 // START
-// ===============================
+// ==========================================
 
 window.addEventListener(
     "load",
